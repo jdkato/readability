@@ -12,6 +12,8 @@ bs4 = "*"
 
 [dev-packages]
 pytest = "*"
+pyhyphen = "*"
+syllables = "*"
 
 [requires]
 python_version = "3.9"
