@@ -1,12 +1,17 @@
 import collections
 import html
+import string
+import re
 
 
 import bs4
 import requests
+from requests.sessions import default_headers
 import syntok.segmenter as segmenter
 
 from readability.ast import HTMLToAST
+from readability.syllables import count_syllables, is_complex
+from commonregex import email, link
 
 
 def fetch(url: str):
@@ -63,14 +68,28 @@ class Readability(object):
     # A mapping of {word: occurrences}.
     word_freq = collections.defaultdict(int)
 
-    def __init__(self, html: str):
+    # A list of scopes to process.
+    default_scopes = ["paragraph", "list", "blockquote"]
+
+    def __init__(self, html: str, scopes=[]):
         self.parser.feed(html)
+
+        targets = scopes if scopes else self.default_scopes
         for node in self.parser.nodes:
-            for paragraph in segmenter.analyze(node["text"]):
+            if node["scope"] not in targets:
+                continue
+
+            text = node["text"]
+            text = re.sub(email, "", text)
+            text = re.sub(link, "", text)
+
+            for paragraph in segmenter.process(text):
                 for sentence in paragraph:
                     self.sent_count += 1
                     for token in sentence:
                         word = token.value
+                        if word in string.punctuation:
+                            continue
                         size = len(word)
 
                         self.char_count += size
@@ -78,3 +97,14 @@ class Readability(object):
 
                         if size > 6:
                             self.long_word_count += 1
+
+                        syllables = count_syllables(word)
+                        self.syll_count += syllables
+
+                        if syllables > 2:
+                            self.psyll_word_count += 1
+
+                        if is_complex(word, syllables):
+                            self.c_word_count += 1
+
+                        self.word_count += 1

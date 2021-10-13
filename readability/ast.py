@@ -24,7 +24,12 @@ INLINE_TAGS = [
 ]
 HEADING = re.compile(r"^h\d$")
 SKIP_TAGS = ["script", "style", "pre", "figure"]
-TAG_TO_SCOPE = {"th": "table.heading", "td": "table.cell", "li": "list"}
+TAG_TO_SCOPE = {
+    "th": "table.heading",
+    "td": "table.cell",
+    "li": "list",
+    "blockquote": "blockquote",
+}
 
 
 def codify(text):
@@ -52,7 +57,11 @@ def make_node(text, history):
             return {"scope": scope, "text": text}
         elif tag in SKIP_TAGS:
             return {"scope": "ignore", "text": text}
-    return {"scope": "paragraph", "text": text}
+
+    if "p" in history:
+        return {"scope": "paragraph", "text": text}
+
+    return {"scope": history[-1], "text": text}
 
 
 class HTMLToAST(html.parser.HTMLParser):

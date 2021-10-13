@@ -3,7 +3,14 @@ import re
 from typing import Tuple, List
 
 
-def syllables(word: str) -> int:
+def is_complex(word: str, syllables: int) -> bool:
+    for suffix in ["es", "ed", "ing"]:
+        if word.endswith(suffix):
+            syllables -= 1
+    return syllables > 2
+
+
+def count_syllables(word: str) -> int:
     """Return the number of syllables in the given word."""
     word = word.lower()
     size = len(word)

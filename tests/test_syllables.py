@@ -2,7 +2,7 @@ import json
 
 import syllables as alt_syll
 
-from readability.syllables import syllables
+from readability.syllables import count_syllables
 from hyphen import Hyphenator
 
 HYP_COUNTER = Hyphenator("en_US")
@@ -24,7 +24,7 @@ def test_n_syllables():
         with open(f"data/{n}-syllable-words.txt") as f:
             for line in f.readlines():
                 word = line.strip()
-                if syllables(word) == n:
+                if count_syllables(word) == n:
                     right += 1
 
                 hc = max(1, len(HYP_COUNTER.syllables(word)))

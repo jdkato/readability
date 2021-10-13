@@ -9,6 +9,7 @@ syllables = "*"
 streamlit = "*"
 syntok = "*"
 bs4 = "*"
+commonregex = "*"
 
 [dev-packages]
 pytest = "*"
